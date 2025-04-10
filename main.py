@@ -73,8 +73,35 @@ df_sante_filtered = df_sante[
 ]
 
 
+# Définition du modèle
+class Indicateurs:
+    def __init__(self, pib_par_habitant, freq_semaine_alcool, freq_mois_alcool, esperance_bonne_sante):
+        self.pib_par_habitant = pib_par_habitant # gdp_per_capita
+        self.freq_mois_alcool = freq_mois_alcool
+        self.esperance_bonne_sante = esperance_bonne_sante
+        pass
+
+class Instances:
+    def __init__(self, annee, pays, sexe):
+        self.annee = annee
+        self.pays = pays
+        self.sexe = sexe
+        pass
+
+# indice_consommation_global_alcool, taux_abstinence, ratio_sante_pib
+class Indicateurs_derives : 
+    def __init__(self, indice_consommation_global_alcool, taux_abstinence, ratio_sante_pib):
+        self.indice_consommation_global_alcool = indice_consommation_global_alcool
+        self.taux_abstinence = taux_abstinence
+        self.ratio_sante_pib = ratio_sante_pib
+        pass
+
+
 
 # TODO
 
 
-# print(df_sante_filtered.to_string(index=False))
+# Pour affichage 
+# print(df_pib_filtered.head())
+# print(df_alcool_filtered.head())
+# print(df_sante_filtered.head())
