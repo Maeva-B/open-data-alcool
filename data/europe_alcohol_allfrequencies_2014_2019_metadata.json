@@ -21,5 +21,29 @@
     "healthy_life_expectancy": "Healthy life expectancy at birth (in years)"
   },
   "license": "CC BY 4.0 (Eurostat - https://creativecommons.org/licenses/by/4.0/)",
-  "date_generated": "2025-05-19"
+  "date_generated": "2025-05-19",
+  "keywords": [
+    "Eurostat",
+    "Alcohol consumption",
+    "Healthy life years",
+    "GDP per capita",
+    "FAIR data",
+    "Public health",
+    "Trading economics",
+    "Open Science"
+  ],
+  "provenance": {
+    "data_retrieval": "Downloaded via Eurostat Dissemination API v1.0 on 2024‑05‑XX using main.py (see repository).",
+    "processing": [
+      "Filtering to years 2014 and 2019",
+      "Pivoting all frequency modalities into separate columns",
+      "Joining with GDP and Healthy Life Years datasets on country + year",
+      "Deduplicating rows and rounding alcohol percentages to one decimal place"
+    ],
+    "limitations": [
+      "Missing GDP values for Iceland, Norway and United Kingdom in 2019 (Eurostat not available)",
+      "Healthy‑life‑years only available for total sex in some countries; NA values kept",
+      "Aggregated EU rows kept for reference but should not be mixed with country‑level analytics"
+    ]
+  }
 }

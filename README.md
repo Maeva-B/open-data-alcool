@@ -1,55 +1,58 @@
-# 🥂 Alcool, économie et espérance de vie en Europe : quelle corrélation ?
+# 🥂 Alcohol, Economy & Healthy Life Expectancy in Europe — What Correlation?
 
-## 🎯 Sujet
+## 🎯 Topic
 
-**En Europe, comment la consommation d'alcool varie-t-elle en fonction du PIB par habitant, et quelles sont les répercussions de cette consommation sur les années de vie en bonne santé ?**
+**Across Europe, how does alcohol consumption vary with GDP per capita, and what impact does this consumption have on healthy life years?**
 
-Ce projet vise à explorer les corrélations possibles entre trois dimensions majeures dans les pays européens :
+This project investigates potential correlations between three public-health and macro-economic dimensions for European countries (2014 & 2019):
 
-- La fréquence de consommation d'alcool
-- Le PIB réel par habitant
-- Le nombre d’années de vie en bonne santé
+- Frequency of alcohol consumption  
+- Real GDP per capita  
+- Healthy life years at birth
 
-## 🔗 Sources des données
+---
 
-Les données utilisées proviennent toutes de la plateforme officielle **Eurostat**, garantissant leur fiabilité et leur mise à jour régulière :
+## 🔗 Data Sources (Eurostat)
 
-1. **Fréquence de consommation d'alcool par sexe, âge et pays de naissance**  
-   https://ec.europa.eu/eurostat/databrowser/product/page/hlth_ehis_al1b  
-   → Explication et analyse dans l’article :  
-   https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Alcohol_consumption_statistics
+| Dimension | Eurostat dataset | API endpoint |
+|-----------|------------------|--------------|
+| Alcohol-consumption frequencies | `hlth_ehis_al1b` | <https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_ehis_al1b> |
+| Real GDP per capita (PPS) | `tipsna40` | <https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tipsna40> |
+| Healthy life years at birth | `hlth_hlye` | <https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_hlye> |
 
-2. **PIB réel par habitant en Europe**  
-   https://ec.europa.eu/eurostat/databrowser/view/tipsna40/default/table?lang=en
+---
 
-3. **Années de vie en bonne santé selon le sexe (à partir de 2004)**  
-   https://ec.europa.eu/eurostat/databrowser/view/hlth_hlye/default/table?lang=en&category=hlth.hlth_state.hlth_hly
+## ✅ FAIR-Principle Compliance
 
-## ✅ Applicabilité des principes FAIR
-
-Afin de garantir la fiabilité, la transparence et la réutilisabilité des données, nous avons vérifié leur conformité avec les **principes FAIR** :
-
-### 🔍 Findable (Facile à trouver)
-- Les données sont accessibles sur Eurostat, référencées avec des **métadonnées riches** (titre, description, unité de mesure, fréquence, etc.)
-- Chaque jeu de données possède un **identifiant unique** et un lien permanent.
+### 🔍 Findable
+- Unique, persistent identifiers and rich metadata provided by Eurostat.  
+- Dataset archived on Zenodo with DOI (see badge above).
 
 ### 📥 Accessible
-- Les données sont publiquement disponibles et **accessibles sans authentification**.
-- Eurostat fournit une **documentation complète** et maintient l'accès aux métadonnées même si les données évoluent.
+- Fully open access via Eurostat’s REST API (no auth required).  
+- Repository and Zenodo release include raw data, scripts & FAIR metadata.
 
 ### 🔗 Interoperable
-- Les formats proposés (CSV, TSV, SDMX) sont **standards** et largement supportés dans les outils d’analyse (Excel, Python, R).
-- Les jeux de données utilisent des **ontologies et des catégorisations normalisées** (ex : NUTS, ISCED, etc.).
+- Standard, machine-readable formats (CSV + JSON; SDMX compatible).  
+- Common European classifiers (ISO-2 country codes, PPS, etc.).
 
 ### 🔁 Reusable
-- Les sources précisent les **conditions d’utilisation** (licence Eurostat – données publiques et réutilisables).
-- Les **métadonnées de provenance** sont disponibles pour chaque jeu de données.
-- Les données sont **vérifiées et de haute qualité**, issues d’enquêtes officielles harmonisées au niveau européen.
+- Licensed under **CC BY 4.0** (Eurostat licence).   
+- Reproducible build pipeline (`main.py`, `cleaner.py`).
+
+---
+
+## 🚀 Quick Start
+
+```bash
+git clone https://github.com/Maeva-B/open-data-alcool.git
+cd open-data-alcool
+python main.py        # download + merge 
+python cleaner.py   # deduplicate + rounding
 
 
-## 📌 Auteurs
 
-Projet réalisé dans le cadre d’un travail universitaire par :
+## 📌 Authors
 
 - Julie Dornat
 - Maëva Burillo
