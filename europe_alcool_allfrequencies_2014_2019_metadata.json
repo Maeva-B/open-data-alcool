@@ -1,0 +1,25 @@
+{
+  "title": "Europe - Toutes fréquences de consommation d'alcool, PIB, espérance de vie en bonne santé (2014 & 2019)",
+  "description": "Données croisées Eurostat : pour chaque pays d'Europe, toutes les fréquences disponibles de consommation d'alcool (population totale, natifs), PIB/habitant et années de vie en bonne santé à la naissance, années 2014 et 2019.",
+  "sources": {
+    "alcool": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_ehis_al1b?format=JSON",
+    "pib": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tipsna40?format=JSON",
+    "sante": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_hlye?format=JSON"
+  },
+  "columns": {
+    "geo": "Code ISO du pays",
+    "time": "Année (2014 ou 2019)",
+    "sex": "Sexe (M = hommes, F = femmes, T = total)",
+    "alcohol_every_day_pct": "Pourcentage de personnes: 'Every day'",
+    "alcohol_every_week_pct": "Pourcentage de personnes: 'Every week'",
+    "alcohol_every_month_pct": "Pourcentage de personnes: 'Every month'",
+    "alcohol_less_than_once_a_month_pct": "Pourcentage de personnes: 'Less than once a month'",
+    "alcohol_not_in_the_last_12_months_pct": "Pourcentage de personnes: 'Not in the last 12 months'",
+    "alcohol_never_pct": "Pourcentage de personnes: 'Never'",
+    "alcohol_never_or_not_in_the_last_12_months_pct": "Pourcentage de personnes: 'Never or not in the last 12 months'",
+    "gdp_per_capita": "PIB réel/habitant en parité de pouvoir d'achat (PPS)",
+    "healthy_life_expectancy": "Années de vie en bonne santé à la naissance"
+  },
+  "license": "CC BY 4.0 (Eurostat - https://creativecommons.org/licenses/by/4.0/)",
+  "date_generated": "2025-05-19"
+}

@@ -9,20 +9,27 @@ import seaborn as sns
 import json
 
 # ==========================
-# 1. Chargement des données Eurostat
+# 1. Loading Eurostat Data
 # ==========================
-url_alcool = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_ehis_al1b?format=JSON'
-url_pib = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tipsna40?format=JSON'
-url_sante = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_hlye?format=JSON'
+url_alcohol = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_ehis_al1b?format=JSON'
+url_gdp = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tipsna40?format=JSON'
+url_health = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_hlye?format=JSON'
 
-# Chargement des datasets
-df_alcool = pyjstat.Dataset.read(requests.get(url_alcool).text).write('dataframe')
-df_pib = pyjstat.Dataset.read(requests.get(url_pib).text).write('dataframe')
-df_sante = pyjstat.Dataset.read(requests.get(url_sante).text).write('dataframe')
+# Load datasets
+df_alcohol = pyjstat.Dataset.read(requests.get(url_alcohol).text).write('dataframe')
+df_gdp = pyjstat.Dataset.read(requests.get(url_gdp).text).write('dataframe')
+df_health = pyjstat.Dataset.read(requests.get(url_health).text).write('dataframe')
 
-# Renommage des colonnes pour clarté
-df_alcool = df_alcool.rename(columns={
-    'Frequency': 'frequency',
+# Rename columns for clarity
+if 'Frequency' in df_alcohol.columns:
+    freq_col = 'Frequency'
+elif 'CONS_ALC' in df_alcohol.columns:
+    freq_col = 'CONS_ALC'
+else:
+    freq_col = [c for c in df_alcohol.columns if 'Freq' in c or 'consumption' in c][0]
+
+df_alcohol = df_alcohol.rename(columns={
+    freq_col: 'frequency',
     'Sex': 'sex',
     'Age class': 'age',
     'Country/region of birth': 'birth_country',
@@ -30,12 +37,12 @@ df_alcool = df_alcool.rename(columns={
     'Time': 'time',
     'value': 'value'
 })
-df_pib = df_pib.rename(columns={
+df_gdp = df_gdp.rename(columns={
     'Geopolitical entity (reporting)': 'geo',
     'Time': 'time',
     'value': 'gdp_per_capita'
 })
-df_sante = df_sante.rename(columns={
+df_health = df_health.rename(columns={
     'Sex': 'sex',
     'Health indicator': 'health_indicator',
     'Geopolitical entity (reporting)': 'geo',
@@ -44,142 +51,116 @@ df_sante = df_sante.rename(columns={
 })
 
 # ==========================
-# 2. Filtrage & nettoyage des données
+# 2. Filtering & Cleaning Data
 # ==========================
 
-# ------ Consommation d'alcool ------
-# Utilise les valeurs exactes du dataset !
-freq_map = {
-    'Every day': 'alcohol_daily_pct',
-    'Every week': 'alcohol_weekly_pct',
-    'Every month': 'alcohol_monthly_pct',
-    'Never': 'alcohol_never_pct'
-}
-df_alcool_f = df_alcool[
-    (df_alcool['age'] == 'Total') &  # population totale
-    (df_alcool['birth_country'] == 'Reporting country') &  # natifs
-    (df_alcool['frequency'].isin(list(freq_map.keys()))) &
-    (df_alcool['time'].isin(['2014', '2019'])) &
-    (~df_alcool['geo'].isin(['TR', 'Türkiye']))
+# ------ Alcohol consumption ------
+df_alcohol_f = df_alcohol[
+    (df_alcohol['age'].str.lower() == 'total') &
+    (df_alcohol['birth_country'].str.lower().str.contains('reporting country')) &
+    (df_alcohol['time'].isin(['2014', '2019'])) &
+    (~df_alcohol['geo'].isin(['TR', 'Türkiye']))
 ].copy()
 
-df_alcool_f['indicator'] = df_alcool_f['frequency'].map(freq_map)
-df_alcool_pivot = df_alcool_f.pivot_table(
+# Dynamic list of all frequencies present in the filtered dataset
+all_freqs = df_alcohol_f['frequency'].unique()
+# Clean frequency names to make valid column names
+colnames = {freq: f"alcohol_{freq.lower().replace(' ', '_').replace('-', '_').replace('/', '_').replace('(', '').replace(')', '').replace('.', '')}_pct"
+            for freq in all_freqs}
+
+df_alcohol_f['indicator'] = df_alcohol_f['frequency'].map(colnames)
+df_alcohol_pivot = df_alcohol_f.pivot_table(
     index=['geo', 'time', 'sex'],
     columns='indicator',
     values='value'
 ).reset_index()
 
-# ------ PIB par habitant ------
-df_pib_f = df_pib[df_pib['time'].isin(['2014', '2019'])][['geo', 'time', 'gdp_per_capita']]
+# ------ GDP per capita ------
+df_gdp_f = df_gdp[df_gdp['time'].isin(['2014', '2019'])][['geo', 'time', 'gdp_per_capita']]
 
-# ------ Années de vie en bonne santé ------
-df_sante_f = df_sante[
-    (df_sante['health_indicator'] == 'Healthy life years in absolute value at birth') &
-    (df_sante['time'].isin(['2014', '2019'])) &
-    (~df_sante['geo'].isin(['CH', 'Switzerland']))
+# ------ Healthy life years ------
+df_health_f = df_health[
+    (df_health['health_indicator'].str.lower().str.contains('healthy life years')) &
+    (df_health['time'].isin(['2014', '2019'])) &
+    (~df_health['geo'].isin(['CH', 'Switzerland']))
 ][['geo', 'time', 'sex', 'healthy_life_expectancy']]
 
 # ==========================
-# 3. Jointure intelligente
+# 3. Smart Merge
 # ==========================
-merged = df_alcool_pivot.merge(df_pib_f, on=['geo', 'time'], how='left')
-merged = merged.merge(df_sante_f, on=['geo', 'time', 'sex'], how='left')
+merged = df_alcohol_pivot.merge(df_gdp_f, on=['geo', 'time'], how='left')
+merged = merged.merge(df_health_f, on=['geo', 'time', 'sex'], how='left')
 
 # ==========================
-# 4. Calculs d'indicateurs dérivés
+# 4. Clean CSV Export
 # ==========================
-merged['alcohol_consumption_index'] = (
-    merged['alcohol_daily_pct'].fillna(0) * 1.0 +
-    merged['alcohol_weekly_pct'].fillna(0) * 0.75 +
-    merged['alcohol_monthly_pct'].fillna(0) * 0.5
-)
-merged['abstinence_rate'] = merged['alcohol_never_pct']
-merged['health_per_gdp_ratio'] = merged['healthy_life_expectancy'] / merged['gdp_per_capita']
-
-# Met les NaN en null pour le CSV (format FAIR)
 merged = merged.where(pd.notnull(merged), None)
-
-# ==========================
-# 5. Export CSV propre
-# ==========================
-csv_name = "europe_alcool_sante.csv"
+csv_name = "europe_alcohol_allfrequencies_2014_2019.csv"
 merged.to_csv(csv_name, index=False)
-print(f"Fichier CSV généré avec succès : {csv_name}")
+print(f"CSV file successfully generated: {csv_name}")
 
 # ==========================
-# 6. Visualisations (optionnelles)
+# 5. FAIR Metadata Generation
+# ==========================
+metadata = {
+    "title": "Europe - All Alcohol Consumption Frequencies, GDP, Healthy Life Expectancy (2014 & 2019)",
+    "description": (
+        "Cross-referenced Eurostat data: for each European country, all available alcohol consumption frequencies "
+        "(total population, natives), GDP per capita, and healthy life expectancy at birth, for the years 2014 and 2019."
+    ),
+    "sources": {
+        "alcohol": url_alcohol,
+        "gdp": url_gdp,
+        "health": url_health
+    },
+    "columns": {
+        "geo": "Country ISO code",
+        "time": "Year (2014 or 2019)",
+        "sex": "Sex (M = male, F = female, T = total)",
+        **{v: f"Percentage of people: '{k}'" for k, v in colnames.items()},
+        "gdp_per_capita": "Real GDP per capita in Purchasing Power Standard (PPS)",
+        "healthy_life_expectancy": "Healthy life expectancy at birth (in years)"
+    },
+    "license": "CC BY 4.0 (Eurostat - https://creativecommons.org/licenses/by/4.0/)",
+    "date_generated": pd.Timestamp.today().strftime('%Y-%m-%d')
+}
+with open("europe_alcohol_allfrequencies_2014_2019_metadata.json", "w", encoding='utf-8') as f:
+    json.dump(metadata, f, ensure_ascii=False, indent=2)
+print("Metadata file successfully generated: europe_alcohol_allfrequencies_2014_2019_metadata.json")
+
+
+# ==========================
+# 6. (Optional) Visualizations
 # ==========================
 def plot_scatter_gdp_vs_alcohol(df):
     plt.figure(figsize=(8,6))
     sns.scatterplot(data=df, x='gdp_per_capita', y='alcohol_consumption_index', hue='geo', style='sex')
-    plt.title("Indice de consommation d'alcool vs PIB par habitant (Europe)")
-    plt.xlabel("PIB par habitant (PPS)")
-    plt.ylabel("Indice de consommation d'alcool")
+    plt.title("Alcohol Consumption Index vs GDP per Capita (Europe)")
+    plt.xlabel("GDP per capita (PPS)")
+    plt.ylabel("Alcohol Consumption Index")
     plt.tight_layout()
     plt.show()
 
 def plot_scatter_alcohol_vs_health(df):
     plt.figure(figsize=(8,6))
     sns.scatterplot(data=df, x='alcohol_consumption_index', y='healthy_life_expectancy', hue='geo', style='sex')
-    plt.title("Espérance de vie en bonne santé vs Indice de consommation d'alcool (Europe)")
-    plt.xlabel("Indice de consommation d'alcool")
-    plt.ylabel("Espérance de vie en bonne santé (années)")
+    plt.title("Healthy Life Expectancy vs Alcohol Consumption Index (Europe)")
+    plt.xlabel("Alcohol Consumption Index")
+    plt.ylabel("Healthy Life Expectancy (years)")
     plt.tight_layout()
     plt.show()
 
 def plot_heatmap_correlation(df):
     plt.figure(figsize=(8,6))
-    corr = df[['gdp_per_capita','alcohol_consumption_index','healthy_life_expectancy']].corr()
+    corr = df[['gdp_per_capita', 'alcohol_consumption_index', 'healthy_life_expectancy']].corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm')
-    plt.title("Corrélation entre PIB, consommation d'alcool et espérance de vie en bonne santé")
+    plt.title("Correlation between GDP, Alcohol Consumption, and Healthy Life Expectancy")
     plt.tight_layout()
     plt.show()
 
-# ==========================
-# 7. Génération des métadonnées FAIR
-# ==========================
-metadata = {
-    "title": "Europe - Consommation d'alcool, PIB par habitant, et Espérance de vie en bonne santé (2014 & 2019)",
-    "description": (
-        "Analyse croisée entre la consommation d’alcool (population totale), le PIB par habitant (PPS) "
-        "et les années de vie en bonne santé à la naissance, pour les pays européens, années 2014 & 2019. "
-        "Données issues d’Eurostat. 1 ligne par pays, année, sexe."
-    ),
-    "sources": {
-        "alcool": url_alcool,
-        "pib": url_pib,
-        "sante": url_sante
-    },
-    "columns": {
-        "geo": "Code ISO du pays",
-        "time": "Année (2014 ou 2019)",
-        "sex": "Sexe (M = hommes, F = femmes, T = total)",
-        "alcohol_daily_pct": "% de personnes buvant tous les jours (population totale, natifs)",
-        "alcohol_weekly_pct": "% buvant au moins une fois par semaine",
-        "alcohol_monthly_pct": "% buvant au moins une fois par mois",
-        "alcohol_never_pct": "% ne buvant jamais",
-        "gdp_per_capita": "PIB réel/habitant en parité de pouvoir d'achat (PPS)",
-        "healthy_life_expectancy": "Nombre moyen d'années de vie en bonne santé à la naissance",
-        "alcohol_consumption_index": "Indice synthétique (1× daily + 0,75× weekly + 0,5× monthly)",
-        "abstinence_rate": "% de non-buveurs (identique à alcohol_never_pct)",
-        "health_per_gdp_ratio": "Années de vie en bonne santé / PIB par habitant"
-    },
-    "license": "CC BY 4.0 (Eurostat - https://creativecommons.org/licenses/by/4.0/)",
-    "exclusions": {
-        "Turquie": "exclue du dataset alcool",
-        "Suisse": "exclue du dataset santé"
-    },
-    "missing_values": "null (jamais 0 si valeur absente)",
-    "reproducibility": "Extraction via le script Python fourni, totalement reproductible.",
-    "date_generated": pd.Timestamp.today().strftime('%Y-%m-%d')
-}
-with open("europe_alcool_sante_metadata.json", "w", encoding='utf-8') as f:
-    json.dump(metadata, f, ensure_ascii=False, indent=2)
-print("Fichier de métadonnées généré avec succès : europe_alcool_sante_metadata.json")
 
 # ==========================
-# 8. Utilisation des graphiques
+# 8. Using the Visualizations
 # ==========================
 # df = pd.read_csv(csv_name)
 # plot_scatter_gdp_vs_alcohol(df)
