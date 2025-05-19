@@ -95,7 +95,7 @@ merged = merged.merge(df_health_f, on=['geo', 'time', 'sex'], how='left')
 # 4. Clean CSV Export
 # ==========================
 merged = merged.where(pd.notnull(merged), None)
-csv_name = "europe_alcohol_allfrequencies_2014_2019.csv"
+csv_name = "./data/europe_alcohol_allfrequencies_2014_2019.csv"
 merged.to_csv(csv_name, index=False)
 print(f"CSV file successfully generated: {csv_name}")
 
@@ -122,9 +122,35 @@ metadata = {
         "healthy_life_expectancy": "Healthy life expectancy at birth (in years)"
     },
     "license": "CC BY 4.0 (Eurostat - https://creativecommons.org/licenses/by/4.0/)",
-    "date_generated": pd.Timestamp.today().strftime('%Y-%m-%d')
+    "date_generated": pd.Timestamp.today().strftime('%Y-%m-%d'),
+    "keywords": [
+        "Eurostat",
+        "Alcohol consumption",
+        "Healthy life years",
+        "GDP per capita",
+        "FAIR data",
+        "Public health",
+        "Trading economics",
+        "Open Science"
+    ],
+    "provenance": {
+        "data_retrieval": "Downloaded via Eurostat Dissemination API v1.0 on 2024‑05‑XX using main.py (see repository).",
+        "processing": [
+        "Filtering to years 2014 and 2019",
+        "Pivoting all frequency modalities into separate columns",
+        "Joining with GDP and Healthy Life Years datasets on country + year",
+        "Deduplicating rows and rounding alcohol percentages to one decimal place"
+        ],
+        "limitations": [
+        "Missing GDP values for Iceland, Norway and United Kingdom in 2019 (Eurostat not available)",
+        "Healthy‑life‑years only available for total sex in some countries; NA values kept",
+        "Aggregated EU rows kept for reference but should not be mixed with country‑level analytics"
+        ]
+    }
 }
-with open("europe_alcohol_allfrequencies_2014_2019_metadata.json", "w", encoding='utf-8') as f:
+
+
+with open("./data/europe_alcohol_allfrequencies_2014_2019_metadata.json", "w", encoding='utf-8') as f:
     json.dump(metadata, f, ensure_ascii=False, indent=2)
 print("Metadata file successfully generated: europe_alcohol_allfrequencies_2014_2019_metadata.json")
 
