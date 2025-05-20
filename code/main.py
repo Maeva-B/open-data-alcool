@@ -95,7 +95,7 @@ merged = merged.merge(df_health_f, on=['geo', 'time', 'sex'], how='left')
 # 4. Clean CSV Export
 # ==========================
 merged = merged.where(pd.notnull(merged), None)
-csv_name = "europe_alcohol_allfrequencies_2014_2019.csv"
+csv_name = "../data/europe_alcohol_allfrequencies_2014_2019.csv"
 merged.to_csv(csv_name, index=False)
 print(f"CSV file successfully generated: {csv_name}")
 
@@ -150,7 +150,7 @@ metadata = {
 }
 
 
-with open("europe_alcohol_allfrequencies_2014_2019_metadata.json", "w", encoding='utf-8') as f:
+with open("../data/europe_alcohol_allfrequencies_2014_2019_metadata.json", "w", encoding='utf-8') as f:
     json.dump(metadata, f, ensure_ascii=False, indent=2)
 print("Metadata file successfully generated: europe_alcohol_allfrequencies_2014_2019_metadata.json")
 
