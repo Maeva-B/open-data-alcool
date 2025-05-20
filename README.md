@@ -39,7 +39,20 @@ This project investigates potential correlations between three public-health and
 ### 🔁 Reusable
 - Licensed under **CC BY 4.0** (Eurostat licence).   
 - Reproducible build pipeline (`main.py`, `cleaner.py`).
+- Visual outputs are saved in open, reusable formats (`.png`) with descriptive metadata for each file.
 
+### 📊 FAIR-Ready Visualizations
+- The script viewer.py allows you to filter by year, sex, and drinking frequency, and generates:
+
+    - Scatterplot: Alcohol consumption (selected frequency) vs GDP per capita
+
+    - Scatterplot: Healthy life expectancy vs Alcohol consumption (selected frequency)
+
+    - Correlation matrix: GDP, alcohol (selected frequency), healthy life expectancy
+
+- All charts are automatically saved to the graph/ directory in high-quality .png format, with descriptive filenames encoding your selected filters and date.
+
+- Each graph can be accompanied by a .txt metadata file (title, filters, date) for full FAIR traceability and reuse.
 ---
 
 ## 🚀 Quick Start

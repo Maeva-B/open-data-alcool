@@ -120,3 +120,6 @@ for filename, description in [
         f.write(f"Title: {description}\n")
         f.write(f"Filters: sex={sex_choice}, year={time_choice}, alcohol_col={alcohol_col}\n")
         f.write(f"Generated on: {date.today()}\n")
+        f.write(f"File: {os.path.basename(filename)}\n")
+        f.write(f"FAIR Compliance: Open format, descriptive filename, reproducible script.\n")
+
