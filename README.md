@@ -62,8 +62,7 @@ git clone https://github.com/Maeva-B/open-data-alcool.git
 cd open-data-alcool
 python main.py        # download + merge 
 python cleaner.py   # deduplicate + rounding
-
-
+```
 
 ## 👥 Authors
 
