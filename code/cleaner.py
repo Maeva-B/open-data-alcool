@@ -1,8 +1,8 @@
 import pandas as pd
 
 # Load the generated file
-input_file = "europe_alcohol_allfrequencies_2014_2019.csv"
-output_file = "europe_alcohol_allfrequencies_2014_2019_CLEAN.csv"
+input_file = "../data/europe_alcohol_allfrequencies_2014_2019.csv"
+output_file = "../data/europe_alcohol_allfrequencies_2014_2019_CLEAN.csv"
 
 df = pd.read_csv(input_file)
 
