@@ -1,0 +1,5 @@
+Title: Scatterplot: Healthy life expectancy vs Alcohol consumption
+Filters: sex=Total, year=2019, alcohol_col=alcohol_every_week_pct
+Generated on: 2025-05-20
+File: scatter_health_vs_alcohol_Total_2019_alcohol_every_week_pct_2025-05-20.png
+FAIR Compliance: Open format, descriptive filename, reproducible script.
