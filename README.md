@@ -65,7 +65,7 @@ python cleaner.py   # deduplicate + rounding
 
 
 
-## 📌 Authors
+## 👥 Authors
 
 - Julie Dornat
 - Maëva Burillo
