@@ -1,4 +1,4 @@
-# 🥂 Alcohol, Economy & Healthy Life Expectancy in Europe — What Correlation?
+# 🥂 Alcohol, Economy & Healthy Life Expectancy in Europe - What Correlation?
 
 ## 🎯 Topic
 
