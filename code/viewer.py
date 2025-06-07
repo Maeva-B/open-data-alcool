@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("../data/europe_alcohol_allfrequencies_2014_2019_CLEAN.csv")
+df = pd.read_csv("data/europe_alcohol_allfrequencies_2014_2019_CLEAN.csv")
 
 import os
 from datetime import date

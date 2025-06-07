@@ -57,11 +57,20 @@ This project investigates potential correlations between three public-health and
 
 ## 🚀 Quick Start
 
+### 📦 Install dependencies
+
 ```bash
-git clone https://github.com/Maeva-B/open-data-alcool.git
-cd open-data-alcool
-python main.py        # download + merge 
-python cleaner.py   # deduplicate + rounding
+pip install pandas matplotlib seaborn requests
+````
+
+### 🛠 Run the scripts (from the root of the project)
+
+```bash
+# Step 1 – Generate merged clean CSV file
+python3 code/main.py
+
+# Step 2 – Generate visualizations
+python3 code/viewer.py
 ```
 
 ## 👥 Authors
